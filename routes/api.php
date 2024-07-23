@@ -10,5 +10,5 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/health_parameters', [DataController::class, 'storeData']);
 Route::post('/dosage', [DataController::class. 'storeDose']);
-Route::get('/api/retrieve', [DataController::class, 'retrieveData']);
+Route::get('/retrieve', [DataController::class, 'retrieveData']);
 

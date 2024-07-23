@@ -28,7 +28,6 @@ class DataController extends Controller
 
     public function storeDose(Request $request)
     {
-        // Validate incoming JSON data
         $validated = $request->validate([
             'dose_taken' => 'required|boolean',
         ]);
@@ -44,7 +43,7 @@ class DataController extends Controller
     public function retrieveData()
     {
         // Retrieve latest data from the database
-        $data = Data::latest()->first();
+        $data = Data::all();
 
         return response()->json($data);
     }

@@ -71,18 +71,35 @@
                     type: 'GET',
                     dataType: 'json',
                     success: function(response) {
-                        // Update table with retrieved data
-                        var ecgSamples = JSON.stringify(response.ecg_samples);
-                        var doseTaken = response.dose_taken ? 'Yes' : 'No';
+                        // Clear the existing table rows
+                        $('#dataTable tbody').empty();
 
-                        var newRow = '<tr>' +
-                            '<td>' + response.heartrate + '</td>' +
-                            '<td>' + response.temperature + '</td>' +
-                            '<td>' + ecgSamples + '</td>' +
-                            '<td>' + doseTaken + '</td>' +
-                            '</tr>';
+                        // Check if response is an array and iterate over it
+                        if (Array.isArray(response)) {
+                            response.forEach(function(item) {
+                                if (item.heartrate !== undefined &&
+                                    item.temperature !== undefined &&
+                                    item.ecg_samples !== undefined &&
+                                    item.dose_taken !== undefined) {
 
-                        $('#dataTable tbody').html(newRow);
+                                    var ecgSamples = JSON.stringify(item.ecg_samples);
+                                    var doseTaken = item.dose_taken ? 'Yes' : 'No';
+
+                                    var newRow = '<tr>' +
+                                        '<td>' + item.heartrate + '</td>' +
+                                        '<td>' + item.temperature + '</td>' +
+                                        '<td>' + ecgSamples + '</td>' +
+                                        '<td>' + doseTaken + '</td>' +
+                                        '</tr>';
+
+                                    $('#dataTable tbody').append(newRow);
+                                } else {
+                                    console.log('Invalid item format:', item);
+                                }
+                            });
+                        } else {
+                            console.log('Invalid response format:', response);
+                        }
                     },
                     error: function(error) {
                         console.log(error);
