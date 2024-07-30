@@ -52,6 +52,8 @@
                         <th>Heart Rate</th>
                         <th>Temperature</th>
                         <th>ECG Samples</th>
+                        <th>R-Value</th>
+                        <th>Oxygen Saturation</th>
                         <th>Dose Taken</th>
                     </tr>
                 </thead>
@@ -80,6 +82,8 @@
                                 if (item.heartrate !== undefined &&
                                     item.temperature !== undefined &&
                                     item.ecg_samples !== undefined &&
+                                    item.r_value !== undefined &&
+                                    item.oxygen_saturation !== undefined &&
                                     item.dose_taken !== undefined) {
 
                                     var ecgSamples = JSON.stringify(item.ecg_samples);
@@ -89,6 +93,8 @@
                                         '<td>' + item.heartrate + '</td>' +
                                         '<td>' + item.temperature + '</td>' +
                                         '<td>' + ecgSamples + '</td>' +
+                                        '<td>' + item.r_value + '</td>' +
+                                        '<td>' + item.oxygen_saturation + '</td>' +
                                         '<td>' + doseTaken + '</td>' +
                                         '</tr>';
 

@@ -17,8 +17,11 @@ return new class extends Migration
             $table->float('temperature');
             $table->json('ecg_samples');
             $table->boolean('dose_taken')->default(false);
+            $table->float('r_value');
+            $table->float('oxygen_saturation');
             $table->timestamps();
         });
+        
     }
 
     /**

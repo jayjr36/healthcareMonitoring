@@ -12,13 +12,17 @@ class DataController extends Controller
         // Validate incoming JSON data
         $validated = $request->validate([
             'heartrate' => 'required|numeric',
+            'oxygen_saturation' => 'required|numeric',
             'temperature' => 'required|numeric',
+            'r_value' => 'required|numeric',
             'ecg_samples' => 'required|array',
         ]);
 
         // Store data in the database
         $data = new Data();
         $data->heartrate = $validated['heartrate'];
+        $data->oxygen_saturation = $validated['oxygen_saturation'];
+        $data->r_value = $validated['r_value'];
         $data->temperature = $validated['temperature'];
         $data->ecg_samples = json_encode($validated['ecg_samples']);
         $data->save();
