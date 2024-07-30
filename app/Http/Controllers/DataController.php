@@ -14,7 +14,6 @@ class DataController extends Controller
             'heartrate' => 'required|numeric',
             'oxygen_saturation' => 'required|numeric',
             'temperature' => 'required|numeric',
-            'r_value' => 'required|numeric',
             'ecg_samples' => 'required|array',
         ]);
 
@@ -22,7 +21,7 @@ class DataController extends Controller
         $data = new Data();
         $data->heartrate = $validated['heartrate'];
         $data->oxygen_saturation = $validated['oxygen_saturation'];
-        $data->r_value = $validated['r_value'];
+        $data->r_value = 0;
         $data->temperature = $validated['temperature'];
         $data->ecg_samples = json_encode($validated['ecg_samples']);
         $data->save();
