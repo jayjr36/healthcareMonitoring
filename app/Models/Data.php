@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Data extends Model
 {
     use HasFactory;
-    protected $fillable = ['heartrate', 'temperature', 'ecg_samples', 'dose_taken', 'r_value', 'oxygen_saturation'];
+    protected $fillable = ['heartrate', 'temperature', 'ecg_samples', 'r_value', 'oxygen_saturation'];
 
     protected $casts = [
         'ecg_samples' => 'array',

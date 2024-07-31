@@ -6,6 +6,6 @@ use App\Http\Controllers\DataController;
 
 
 Route::post('/health_parameters', [DataController::class, 'storeData']);
-Route::post('/dosage', [DataController::class. 'storeDose']);
+Route::post('/dosage', [DataController::class, 'storeDose']);
 Route::get('/retrieve', [DataController::class, 'retrieveData']);
 

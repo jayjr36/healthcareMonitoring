@@ -11,16 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('data', function (Blueprint $table) {
+        Schema::create('doses', function (Blueprint $table) {
             $table->id();
-            $table->float('heartrate');
-            $table->float('temperature');
-            $table->json('ecg_samples');
-            $table->float('r_value');
-            $table->float('oxygen_saturation');
+            $table->boolean('dose_taken');
             $table->timestamps();
         });
-        
     }
 
     /**
@@ -28,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('data');
+        Schema::dropIfExists('doses');
     }
 };

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Data;
+use App\Models\Dose;
+use Illuminate\Http\Request;
 
 class DataController extends Controller
 {
@@ -35,20 +36,25 @@ class DataController extends Controller
             'dose_taken' => 'required|boolean',
         ]);
 
-        // Store dose_taken value in the database (assuming there's a 'dose_taken' column in 'data' table)
-        $data = Data::latest()->first();
-        $data->dose_taken = $validated['dose_taken'];
-        $data->save();
+        $dose = new Dose();
+        $dose->dose_taken = $validated['dose_taken'];
+        $dose->save();
 
         return response()->json(['status' => 'success']);
     }
 
     public function retrieveData()
     {
-        // Retrieve latest data from the database
         $data = Data::all();
 
-        return response()->json($data);
+        $doses = Dose::all();
+
+        $response = [
+            'data' => $data,
+            'doses' => $doses,
+        ];
+
+        return response()->json($response);
     }
 }
 
