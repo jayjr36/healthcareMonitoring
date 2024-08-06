@@ -45,9 +45,9 @@ class DataController extends Controller
 
     public function retrieveData()
     {
-        $data = Data::all();
+$data = Data::orderBy('created_at', 'desc')->take(30)->get();
 
-        $doses = Dose::all();
+$doses = Dose::orderBy('created_at', 'desc')->take(30)->get();
 
         $response = [
             'data' => $data,

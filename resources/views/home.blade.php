@@ -81,6 +81,18 @@
         </div>
     </div>
 
+    <div class="charts">
+        <h4 class="text-center py-3">Heartrate Graph</h4>
+        <canvas id="heartRateChart"></canvas>
+        <h4 class="text-center py-3">Temperature Graph</h4>
+        <canvas id="temperatureChart"></canvas>
+        <h4 class="text-center py-3">ECG Graph</h4>
+        <canvas id="ecgSamplesChart"></canvas>
+        <h4 class="text-center py-3">Oxygen Saturation Graph</h4>
+        <canvas id="oxygenSaturationChart"></canvas>
+    </div>
+    
+
     <script>
         $(document).ready(function() {
             // Function to fetch data from server and update tables
@@ -150,5 +162,173 @@
             setInterval(fetchData, 5000);
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var heartRateData = [];
+            var temperatureData = [];
+            var ecgDatasets = [];
+            var oxygenSaturationData = [];
+            var timeLabels = [];
+        
+            // Initialize the charts
+            var heartRateChart = new Chart(document.getElementById('heartRateChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: timeLabels,
+                    datasets: [{
+                        label: 'Heart Rate',
+                        data: heartRateData,
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    }]
+                }
+            });
+        
+            var temperatureChart = new Chart(document.getElementById('temperatureChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: timeLabels,
+                    datasets: [{
+                        label: 'Temperature',
+                        data: temperatureData,
+                        borderColor: 'rgb(54, 162, 235)',
+                        tension: 0.1
+                    }]
+                }
+            });
+        
+            var ecgSamplesChart = new Chart(document.getElementById('ecgSamplesChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: [], // To be filled dynamically if needed
+                    datasets: ecgDatasets
+                }
+            });
+        
+            var oxygenSaturationChart = new Chart(document.getElementById('oxygenSaturationChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: timeLabels,
+                    datasets: [{
+                        label: 'Oxygen Saturation',
+                        data: oxygenSaturationData,
+                        borderColor: 'rgb(153, 102, 255)',
+                        tension: 0.1
+                    }]
+                }
+            });
+        
+            function fetchData() {
+                $.ajax({
+                    url: '/api/retrieve',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        // Clear the table and dataset arrays
+                        $('#dataTable tbody').empty();
+                        $('#doseTable tbody').empty();
+                        
+                        // Reset ECG datasets
+                        ecgDatasets = [];
+                        
+                        if (Array.isArray(response.data)) {
+                            response.data.forEach(function(item, index) {
+                                if (item.heartrate !== undefined &&
+                                    item.temperature !== undefined &&
+                                    item.ecg_samples !== undefined &&
+                                    item.oxygen_saturation !== undefined) {
+        
+                                    var newRow = '<tr>' +
+                                        '<td>' + item.heartrate + '</td>' +
+                                        '<td>' + item.temperature + '</td>' +
+                                        '<td>' + JSON.stringify(item.ecg_samples) + '</td>' +
+                                        '<td>' + item.oxygen_saturation + '</td>' +
+                                        '</tr>';
+        
+                                    $('#dataTable tbody').append(newRow);
+        
+                                    heartRateData.push(item.heartrate);
+                                    temperatureData.push(item.temperature);
+                                    oxygenSaturationData.push(item.oxygen_saturation);
+                                    timeLabels.push(new Date().toLocaleTimeString());
+        
+                                    // Parse ecg_samples from string to array
+                                    try {
+                                        var ecgSamplesArray = JSON.parse(item.ecg_samples);
+        
+                                        if (Array.isArray(ecgSamplesArray)) {
+                                            ecgDatasets.push({
+                                                label: 'ECG Sample ' + (index + 1),
+                                                data: ecgSamplesArray,
+                                                borderColor: 'rgb(' + (index * 30 % 255) + ', ' + (index * 60 % 255) + ', ' + (index * 90 % 255) + ')',
+                                                fill: false,
+                                                tension: 0.1
+                                            });
+                                        } else {
+                                            console.log('Parsed ECG Samples is not an array:', ecgSamplesArray);
+                                        }
+                                    } catch (e) {
+                                        console.log('Error parsing ECG Samples:', e);
+                                    }
+        
+                                    // Limit the data array size
+                                    if (heartRateData.length > 20) {
+                                        heartRateData.shift();
+                                        temperatureData.shift();
+                                        oxygenSaturationData.shift();
+                                        timeLabels.shift();
+                                    }
+                                } else {
+                                    console.log('Invalid item format:', item);
+                                }
+                            });
+        
+                            // Set labels for ECG dataset if needed
+                            // For simplicity, we assume that each ECG sample has the same length
+                            if (ecgDatasets.length > 0 && ecgDatasets[0].data.length > 0) {
+                                ecgSamplesChart.data.labels = Array.from({length: ecgDatasets[0].data.length}, (_, i) => i + 1);
+                            }
+        
+                            // Update the charts
+                            heartRateChart.update();
+                            temperatureChart.update();
+                            ecgSamplesChart.data.datasets = ecgDatasets;
+                            ecgSamplesChart.update();
+                            oxygenSaturationChart.update();
+                        } else {
+                            console.log('Invalid response format:', response);
+                        }
+        
+                        if (Array.isArray(response.doses)) {
+                            response.doses.forEach(function(dose) {
+                                var doseTaken = dose.dose_taken ? 'Yes' : 'No';
+                                var createdAt = new Date(dose.created_at).toLocaleString();
+        
+                                var doseRow = '<tr>' +
+                                    '<td>' + doseTaken + '</td>' +
+                                    '<td>' + createdAt + '</td>' +
+                                    '</tr>';
+        
+                                $('#doseTable tbody').append(doseRow);
+                            });
+                        } else {
+                            console.log('Invalid dose response format:', response);
+                        }
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+        
+            fetchData();
+            setInterval(fetchData, 2000);
+        });
+        </script>
+        
+        
+        
 </body>
 </html>
